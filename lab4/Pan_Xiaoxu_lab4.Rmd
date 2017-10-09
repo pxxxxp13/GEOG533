@@ -1,0 +1,124 @@
+---
+title: "Lab4"
+author: "Xiaoxu Pan"
+date: "2017/10/6"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(raster)
+require(rgdal)
+```
+
+## Question 1
+The number of points scored by each team in a tournament is normally distributed, with mean = 32 and standard deviation = 7. What is the probability of
+
+### Question1a 
+A team scoring 20 points or fewer?
+```{r}
+pnorm(20,mean = 32,sd = 7)
+curve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')
+cord.x <- c(0,seq(0,20,by = 0.01),20)
+cord.y <- c(0,dnorm(seq(0,20,0.01),mean = 32,sd = 7),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+### Question1b
+A team scoring more than 35 points?
+```{r}
+pnorm(35,mean = 32,sd = 7,lower.tail = FALSE)
+curve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')
+cord.x <- c(35,seq(35,64,by = 0.01),64)
+cord.y <- c(0,dnorm(seq(35,64,0.01),mean = 32,sd = 7),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+### Question1c
+A team scoring between 20 and 40 points?
+```{r}
+diff(pnorm(c(20,40),mean = 32,sd = 7))
+curve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')
+cord.x <- c(20,seq(20,40,by = 0.01),40)
+cord.y <- c(0,dnorm(seq(20,40,0.01),mean = 32,sd = 7),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+## Question 2
+The number of comments per post on a social media site is exponentially distributed, with the average post receiving ten comments. What percentage of posts get:
+
+### Question2a
+Fewer than three comments? 
+```{r}
+pexp(3,rate = 1/10)
+curve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')
+cord.x <- c(0,seq(0,3,0.01),3)
+cord.y <- c(0,dexp(seq(0,3,0.01),rate = 1/10),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+### Question2b
+More than 20 comments?
+```{r}
+pexp(20,rate = 1/10,lower.tail = FALSE)
+curve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')
+cord.x <- c(20,seq(20,50,0.01),50)
+cord.y <- c(0,dexp(seq(20,50,0.01),rate = 1/10),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+### Question2c
+Between five and ten comments?
+```{r}
+diff(pexp(c(5,10),rate = 1/10))
+curve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')
+cord.x <- c(5,seq(5,10,0.01),10)
+cord.y <- c(0,dexp(seq(5,10,0.01),rate = 1/10),0)
+polygon(cord.x,cord.y,density = 50,col = 'red')
+```
+
+## Question 3
+Basic raster creation and calculation:
+
+### Question3a
+Create a first raster (30 rows 30 columns) and assign values to the raster based on random values from a uniform distribution.
+```{r}
+ras1 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)
+ras1[] <- runif(ncell(ras1))
+plot(ras1)
+hist(ras1)
+```
+
+### Question3b
+Create a second raster (30 rows 30 columns) and assign values to the raster based on random values from a normal distribution.
+```{r}
+ras2 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)
+ras2[] <- rnorm(ncell(ras2))
+plot(ras2)
+hist(ras2)
+```
+
+### Question3c
+Create a third raster (30 rows 30 columns) and assign values to the raster based on cell-by-cell addition of the first raster and the second raster. 
+```{r}
+ras3 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)
+ras3[] <- ras1[] + ras2[]
+plot(ras3)
+hist(ras3)
+```
+
+### Question3d
+Calculate the mean value of the third raster. Reclassify the third raster into a binary image: 1 (cell value > mean value) and 0 (cell value <= mean value). Save the reclassified image to your working directory as a TIFF image.
+```{r}
+M <- cellStats(ras3,"mean")
+M
+ras3[ras3 > M] <- 1
+ras3[ras3 <= M] <- 0
+writeRaster(ras3,filename = "reclassifiedR.tif",overwrite = TRUE)
+plot(ras3)
+hist(ras3)
+```
+

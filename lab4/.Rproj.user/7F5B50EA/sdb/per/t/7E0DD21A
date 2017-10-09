@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Lab4\"\nauthor: \"Xiaoxu Pan\"\ndate: \"2017/10/6\"\noutput: \n  html_document:\n    toc: TRUE\n    toc_float: TRUE\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\nrequire(raster)\nrequire(rgdal)\n```\n\n## Question 1\nThe number of points scored by each team in a tournament is normally distributed, with mean = 32 and standard deviation = 7. What is the probability of\n\n### Question1a \nA team scoring 20 points or fewer?\n```{r}\npnorm(20,mean = 32,sd = 7)\ncurve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')\ncord.x <- c(0,seq(0,20,by = 0.01),20)\ncord.y <- c(0,dnorm(seq(0,20,0.01),mean = 32,sd = 7),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n### Question1b\nA team scoring more than 35 points?\n```{r}\npnorm(35,mean = 32,sd = 7,lower.tail = FALSE)\ncurve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')\ncord.x <- c(35,seq(35,64,by = 0.01),64)\ncord.y <- c(0,dnorm(seq(35,64,0.01),mean = 32,sd = 7),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n### Question1c\nA team scoring between 20 and 40 points?\n```{r}\ndiff(pnorm(c(20,40),mean = 32,sd = 7))\ncurve(dnorm(x,32,7),xlim = c(0,64),main='Normal Distribution')\ncord.x <- c(20,seq(20,40,by = 0.01),40)\ncord.y <- c(0,dnorm(seq(20,40,0.01),mean = 32,sd = 7),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n## Question 2\nThe number of comments per post on a social media site is exponentially distributed, with the average post receiving ten comments. What percentage of posts get:\n\n### Question2a\nFewer than three comments? \n```{r}\npexp(3,rate = 1/10)\ncurve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')\ncord.x <- c(0,seq(0,3,0.01),3)\ncord.y <- c(0,dexp(seq(0,3,0.01),rate = 1/10),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n### Question2b\nMore than 20 comments?\n```{r}\npexp(20,rate = 1/10,lower.tail = FALSE)\ncurve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')\ncord.x <- c(20,seq(20,50,0.01),50)\ncord.y <- c(0,dexp(seq(20,50,0.01),rate = 1/10),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n### Question2c\nBetween five and ten comments?\n```{r}\ndiff(pexp(c(5,10),rate = 1/10))\ncurve(dexp(x,rate = 1/10),xlim = c(0,50),main='Exponential Distribution')\ncord.x <- c(5,seq(5,10,0.01),10)\ncord.y <- c(0,dexp(seq(5,10,0.01),rate = 1/10),0)\npolygon(cord.x,cord.y,density = 50,col = 'red')\n```\n\n## Question 3\nBasic raster creation and calculation:\n\n### Question3a\nCreate a first raster (30 rows 30 columns) and assign values to the raster based on random values from a uniform distribution.\n```{r}\nras1 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)\nras1[] <- runif(ncell(ras1))\nplot(ras1)\nhist(ras1)\n```\n\n### Question3b\nCreate a second raster (30 rows 30 columns) and assign values to the raster based on random values from a normal distribution.\n```{r}\nras2 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)\nras2[] <- rnorm(ncell(ras2))\nplot(ras2)\nhist(ras2)\n```\n\n### Question3c\nCreate a third raster (30 rows 30 columns) and assign values to the raster based on cell-by-cell addition of the first raster and the second raster. \n```{r}\nras3 <- raster(nrows=30,ncols=30,xmn=0,xmx=30,ymn=0,ymx=30)\nras3[] <- ras1[] + ras2[]\nplot(ras3)\nhist(ras3)\n```\n\n### Question3d\nCalculate the mean value of the third raster. Reclassify the third raster into a binary image: 1 (cell value > mean value) and 0 (cell value <= mean value). Save the reclassified image to your working directory as a TIFF image.\n```{r}\nM <- cellStats(ras3,\"mean\")\nM\nras3[ras3 > M] <- 1\nras3[ras3 <= M] <- 0\nwriteRaster(ras3,filename = \"reclassifiedR.tif\",overwrite = TRUE)\nplot(ras3)\nhist(ras3)\n```\n\n",
+    "created" : 1507317869547.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "381384548",
+    "id" : "7E0DD21A",
+    "lastKnownWriteTime" : 1507558625,
+    "last_content_update" : 1507558679583,
+    "path" : "~/Desktop/533/lab4/Pan_Xiaoxu_lab4.Rmd",
+    "project_path" : "Pan_Xiaoxu_lab4.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "8C110FFF773849d4",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

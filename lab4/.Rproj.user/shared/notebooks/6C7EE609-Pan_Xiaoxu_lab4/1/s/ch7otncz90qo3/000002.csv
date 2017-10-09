@@ -1,0 +1,11 @@
+"0","M <- cellStats(ras3,""mean"")
+M
+"
+"1","[1]"
+"1"," 0.5044444"
+"1","
+"
+"0","ras3[ras3 > M] <- 1"
+"0","ras3[ras3 <= M] <- 0"
+"0","writeRaster(ras3,filename = ""reclassifiedR.tif"",overwrite = TRUE)"
+"0","plot(ras3)"
