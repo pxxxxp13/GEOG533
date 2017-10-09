@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "install.packages('dplyr')\nlibrary(dplyr)\nlibrary(MASS)\ndf <- Cars93\nhead(df)\n\ndf.training <- sample_n(df,40)                                          ##select 40 cars for training dataset\ndf.test <- setdiff(df,df.training)                                      ##remaining 53 cars as the test dataset\nwrite.csv(df.training,\"carstraining\")                                   ##save datasets as csv files\nwrite.csv(df.test,\"carstest\")\nnrow(df.training[df.training$Origin == \"USA\",])                         ##find out the number of usa and non-usa cars\nnrow(df.training[df.training$Origin == \"non-USA\",])\n\nBirth1 <- sample(c('boy','girl'),10,replace = TRUE,prob = c(0.515,0.485))\nprint(Birth1)\ntable(Birth1)\nBirth2 <- sample(c('boy','girl'),10000,replace = TRUE,prob = c(0.515,0.485))\nprint(Birth2)\ntable(Birth2)\n\ndbinom(3,size = 10,prob = 0.515)\ndbinom(8,size = 10,prob = 0.515)+pbinom(8,size = 10,prob = 0.515,lower.tail = FALSE)\nx <- 0:10                                                                ##plot the function\ny <- dbinom(x,size = 10,prob = 0.515)\nyy <- pbinom(x,size = 10,prob = 0.515)\nplot(x,y,type = \"l\",main = 'density',xlab = 'number of boys',ylab = 'possibility')\nplot(x,yy,type = \"l\",main = 'cumulative',xlab = 'number of boys',ylab = 'possibility')\n\ndpois(4,lambda = 5)\nppois(5,lambda = 5,lower.tail = FALSE)\np <- 0:20                                                                 ##plot the function\nq <- dpois(p,lambda = 5)\nplot(p,q,type = 'l',main = 'density',xlab = 'number of cars',ylab = 'possibility')\n",
+    "created" : 1506622906892.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4091790930",
+    "id" : "DC9728D4",
+    "lastKnownWriteTime" : 1506725116,
+    "last_content_update" : 1506725116681,
+    "path" : "~/Desktop/533/lab3/lab3.R",
+    "project_path" : "lab3.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

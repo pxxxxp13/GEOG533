@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Lab3\"\nauthor: \"Xiaoxu Pan\"\ndate: \"2017/9/29\"\noutput: \n  html_document:\n    toc: TRUE\n    toc_float: TRUE\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\nlibrary(dplyr)\nlibrary(MASS)\n```\n\n## Question 1\n> The **Cars93** dataset in the **MASS** package contains data from 93 cars on sale in the USA in 1993. Randomly select 40 cars as the training dataset and the remaining 53 cars as the test dataset. Save both datasets as csv files. Find out the number of **USA** and **non-USA** cars in the training dataset.\n\n  + Training dataset\n```{r,echo=FALSE}\ndf <- Cars93\ndf.training <- sample_n(df,40)                                    \ndf.test <- setdiff(df,df.training)                                \nwrite.csv(df.training,\"carstraining\")                              \nread.csv('carstraining')\n\n```\n  + Test dataset\n```{r,echo=FALSE}\nwrite.csv(df.test,\"carstest\")\nread.csv('carstest')\n```\n  + Number of USA and non-USA cars in the training dataset\n```{r,echo=FALSE}\nnrow(df.training[df.training$Origin == \"USA\",])                   \nnrow(df.training[df.training$Origin == \"non-USA\",])\n```\n\n## Question 2\n> Assume that the probabilities of boy and girl births are 0.515 and 0.485, respectively. Use the **sample()** function to simulate 10 births and print out the result. How many boys and girls do you get out of 10 births? Then simulate 10,000 births. How many boys and girls do you get out of 10,000 births?\n\n  + Result of 10 births\n```{r,echo=FALSE}\nBirth1 <- sample(c('boy','girl'),10,replace = TRUE,prob = c(0.515,0.485))\ntable(Birth1)\nprint(Birth1)\n```\n  + Result of 10000 births\n```{r,echo=FALSE}\nBirth2 <- sample(c('boy','girl'),10000,replace = TRUE,prob = c(0.515,0.485))\ntable(Birth2)\nprint(Birth2)\n```\n\n## Question 3\n> Assume that the probabilities of boy and girl births are 0.515 and 0.485, respectively. What’s the probability of having exactly 3 boys out of 10 births? What’s the probability of having 8 or more boys out of 10 births? Plot both the density function and cumulative probability function of the number of boy births out of 10. \n\n  + Probability of having exactly 3 boys out of 10 births\n```{r,echo=FALSE}\ndbinom(3,size = 10,prob = 0.515)\n```\n  + Probability of having 8 or more boys out of 10 births\n```{r,echo=FALSE}\ndbinom(8,size = 10,prob = 0.515)+pbinom(8,size = 10,prob = 0.515,lower.tail = FALSE)\n```\n  + Plot both the density function and cumulative probability function of the number of boy births out of 10\n```{r,echo=FALSE}\nx <- 0:10                                                               \ny <- dbinom(x,size = 10,prob = 0.515)\nyy <- pbinom(x,size = 10,prob = 0.515)\nplot(x,y,type = \"l\",main = 'density',xlab = 'number of boys',ylab = 'possibility')\nplot(x,yy,type = \"l\",main = 'cumulative',xlab = 'number of boys',ylab = 'possibility')\n\n```\n\n## Question 4\n> If cars arrive randomly at a traffic light at the rate of five every ten seconds. What the probability that exactly four cars arrive in the next ten seconds? What’s the probability that more than five cars arrive in the next ten seconds? Plot the density function of 0-20 cars arriving in the next ten seconds\n\n  + Probability that exactly four cars arrive in the next ten seconds\n```{r,echo=FALSE}\ndpois(4,lambda = 5)\n```\n  + Probability that more than five cars arrive in the next ten seconds\n```{r,echo=FALSE}\nppois(5,lambda = 5,lower.tail = FALSE)\n```\n  + Plot the density function of 0-20 cars arriving in the next ten seconds\n```{r,echo=FALSE}\np <- 0:20                                                               \nq <- dpois(p,lambda = 5)\nplot(p,q,type = 'l',main = 'density',xlab = 'number of cars',ylab = 'possibility')\n```\n\n",
+    "created" : 1506722872397.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1615421544",
+    "id" : "4845842E",
+    "lastKnownWriteTime" : 1506725209,
+    "last_content_update" : 1506725209154,
+    "path" : "~/Desktop/533/lab3/lab3.Rmd",
+    "project_path" : "lab3.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "F6D0B55474e88496",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

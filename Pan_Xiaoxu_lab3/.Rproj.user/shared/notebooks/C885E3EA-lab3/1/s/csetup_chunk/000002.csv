@@ -1,0 +1,97 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","install.packages('dplyr')"
+"2","trying URL 'https://cran.rstudio.com/bin/macosx/el-capitan/contrib/3.4/dplyr_0.7.4.tgz'
+"
+"2","Content type 'application/x-gzip'"
+"2"," length 5094432 bytes (4.9 MB)
+"
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","="
+"2","
+"
+"2","downloaded 4.9 MB
+
+"
+"2","tar: Failed to set default locale
+"
+"1","
+"
+"1","The downloaded binary packages are in
+	/var/folders/g8/y66nmw4530g7_q0z_q68ybw80000gn/T//RtmpKtNRoI/downloaded_packages"
+"1","
+"
+"0","library(dplyr)"
+"2","package 'dplyr' was built under R version 3.4.2"
+"2","
+Attaching package: 'dplyr'
+
+"
+"2","The following objects are masked from 'package:stats':
+
+    filter, lag
+
+"
+"2","The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(MASS)"
+"2","
+Attaching package: 'MASS'
+
+"
+"2","The following object is masked from 'package:dplyr':
+
+    select
+
+"
+"0","df <- Cars93"
