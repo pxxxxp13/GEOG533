@@ -1,6 +1,6 @@
 ---
 title: "Geog533 Lab 6 - ANOVA"
-author: "Your name"
+author: "Xiaoxu Pan"
 output:
   html_document:
     toc: yes
