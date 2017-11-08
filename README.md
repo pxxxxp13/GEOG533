@@ -2,4 +2,4 @@
 Statistics for Geography (GEOG 533)
 
 ### lab
-[lab 6](https://pxxxxp13.github.io/lab6/lab06_Pan_Xiaoxu.html)
+[lab 7](https://pxxxxp13.github.io/lab%207/lab07-Correlation-Pan_Xiaoxu.html#problem_9f)
