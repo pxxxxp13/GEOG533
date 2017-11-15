@@ -1,0 +1,267 @@
+---
+title: "Geog533 Lab 8"
+author: "Xiaoxu Pan"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+Complete the following exercises in Chapter 8 (Introduction to Regression Analysis) of the textbook [R] pages 247-250. 
+
+## Question 1
+
+This is Exercise 1 in Chapter 8 of the Textbook [R].
+
+A regression of weekly shopping trip frequency on annual income (data entered in thousands of dollars) is performed on data collected from 24 respondents. The results are summarized below:
+
+* Intercept: 0.46
+* Slope: 0.19
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|                 |                    |                |                 |
+| Residual |       1.7       |                    |                |                 |
+| Total    |       2.3       |                    |                |                 |
+
+
+### Question 1(a)
+Fill in the blanks in the ANOVA table.
+
+```{r}
+RSS <- 2.3-1.7
+n <- 24
+df1 <- 1
+df2 <- n-2
+df <- n-1
+RGMS <- RSS/df1
+RSMS <- 1.7/df2
+MT <- 2.3/df
+F <- RGMS/RSMS
+```
+
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|     `r RSS`     |      `r df1`       |    `r RGMS`    |      `r F`      |
+| Residual |       1.7       |      `r df2`       |    `r RSMS`    |                 |
+| Total    |       2.3       |      `r df`        |    `r MT`      |                
+
+
+### Question 1(b)
+What is the predicted number of weekly shopping trips for someone making $50,000/year?
+```{r}
+Premoney <- 0.46+0.19*50
+Premoney
+```
+
+
+### Question 1(c)
+In words, what is the meaning of the coefficient 0.19?
+Coefficient 0.19 represents a positive correlation between shopping trip frequency and annual income, which means that for every increase in annual income, the number of shopping trip for the individual will rise by 0.19.
+
+
+### Question 1(d)
+Is the regression coefficient significantly different from zero? How do you know?
+```{r}
+f.critical <- qf(0.95,1,22)
+if(F>f.critical){
+  print("The regression coefficient is significantly different from zero")
+}else{
+   print("The regression coefficient is not significantly different from zero")
+}
+```
+
+
+
+### Question 1(e)
+What is the value of the correlation coefficient?
+```{r}
+sr <- RSS/2.3
+r <- sqrt(sr)
+r
+```
+
+
+
+
+
+## Question 2
+
+This is Exercise 6 in Chapter 8 of the Textbook [R].
+
+The following data are collected in an effort to determine whether snowfall is dependent upon elevation: 
+
+| Snowfall (inches) | Elevation (feet) |
+|-------------------|------------------|
+|       36          |       400        |
+|       78          |       800        |
+|       11          |       200        |
+|       45          |       675        |
+
+Using R, show your work on exercises (a) through (g).
+
+### Question 2(a)
+Find the regression coefficients (the intercept and the slope coefficient).
+```{r}
+snowfall <- c(36,78,11,45)
+elevation <- c(400,800,200,675)
+ms <- mean(snowfall)
+me <- mean(elevation)
+ds <- snowfall-ms
+de <- elevation-me
+r <- sum(ds*de)/(3*sd(snowfall)*sd(elevation))
+slope <- r*sd(snowfall)/sd(elevation)
+intercept <- ms-slope*me
+print(paste("The intercept is", round(intercept,digits = 5)))
+print(paste("The slope is", round(slope,digits = 5)))
+```
+
+
+### Question 2(b)
+Estimate the standard error of the residuals about the regression line.
+```{r}
+TSS <- sum(ds*ds)
+RGSS <- TSS*r*r
+RSSS <- TSS-RGSS
+RSMS <- RSSS/2
+rerror <- sqrt(RSMS)
+rerror
+```
+
+
+### Question 2(c)
+Test the hypothesis that the regression coefficient associated with the independent variables is equal to zero. Also place a 95% confidence interval on the regression coefficient.
+```{r}
+F <- RGSS/RSMS
+f.critical <- qf(0.95,1,2)
+if(F>f.critical){
+  print("The regression coefficient associated with the independent variables is not equal to zero")
+}else{
+  print("The regression coefficient associated with the independent variables is equal to zero")
+}
+result <- t.test(snowfall,elevation)
+print(paste("The 95% confidence interval is",result$conf.int[1],result$conf.int[2]))
+```
+
+
+### Question 2(d)
+Find the value of $r^2$.
+```{r}
+r2 <- r*r
+r2
+```
+
+
+### Question 2(e)
+Make a table of the observed values, predicted values, and the residuals.
+```{r}
+x <- c(400,800,200,675)
+y <- intercept+slope*x
+e <- snowfall-y
+DF <- as.data.frame(cbind(x,y,e))
+names(DF) <- c("observed values","predicted values","residuals")
+DF
+```
+
+
+### Question 2(f)
+Prepare an analysis of variance table portraying the regression results.
+```{r}
+df1 <- 1
+df2 <- 4-2
+df <- 4-1
+F <- RGSS/RSMS
+```
+
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|    `r RGSS`     |     `r df1`        |   `r RGSS`     |     `r F`       |
+| Residual |    `r RSSS`     |     `r df2`        |   `r RSMS`     |                 |
+| Total    |    `r TSS`      |     `r df`         |                |                 |
+
+### Question 2(g)
+Graph the data and the regression line.
+```{r}
+plot(snowfall~elevation)
+m <- lm(snowfall~elevation)
+abline(m,col="red",lwd=2)
+```
+
+
+
+
+## Question 3
+
+This is Exercise 10 in Chapter 8 of the Textbook [R].
+
+Use R and the [Milwaukee dataset](http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv) to:
+
+### Problem
+perform a regression using sales price as the dependent variable and lot size as the independent variable.
+
+### Solution
+```{r}
+url = "http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv"
+df <- read.csv(url)
+y <- df$SalePrice
+x <- df$LotSize
+m <- lm(y~x)
+summary(m)
+print(paste("The regression correlation is y =",m$coefficients[1],"+",m$coefficients[2],"* x"))
+```
+
+
+
+## Question 4
+
+This is Exercise 11 in Chapter 8 of the Textbook [R].
+
+Use R and the Hypothetical [UK Housing Prices dataset](http://spatial.binghamton.edu/geog533/data/UK_Housing.csv) to:
+
+### Question 4(a) 
+perform a regression using house price as the dependent variable, and number of bedrooms as the independent variable;
+
+```{r}
+url = "http://spatial.binghamton.edu/geog533/data/UK_Housing.csv"
+df <- read.csv(url)
+y <- df$price
+x <- df$bedrooms
+m <- lm(y~x)
+summary(m)
+print(paste("The regression correlation is y =",m$coefficients[1],"+",m$coefficients[2],"* x"))
+```
+
+
+### Question 4(b) 
+(b) repeat part (a), using the number of bathrooms as the independent variable, and comment on the results.
+```{r}
+x <- df$bathrooms
+m <- lm(y~x)
+summary(m)
+print(paste("The regression correlation is y =",m$coefficients[1],"+",m$coefficients[2],"* x"))
+print("There are positive correlation between the number of bathrooms and house price. The correlation could represent 1.4% of the relationship while the correlation of the number of bedrooms and house price is stronger than the correlation of the number of bathrooms and house price ")
+```
+
+
+## Question 5
+Download the [hometown.csv](http://spatial.binghamton.edu/geog533/data/hometown.csv), append your name and hometown coordinates to the csv, then use [leaflet](https://rstudio.github.io/leaflet/) to create a web map (10 pt.)
+
+```{r}
+url <- "http://spatial.binghamton.edu/geog533/data/hometown.csv"
+df <- read.csv(url)
+newRow <- data.frame(lastname="Pan",firstname="Xiaoxu",type="grads",location="40.223034,116.237537",latitude="40.223034",longitude="116.237537",image="",fullname="Xiaoxu Pan",popup="")
+dfnew <- rbind(df,newRow)
+dfnew[30:34,]
+if(!require(leaflet)) {install.packages("leaflet")}
+library(leaflet)
+m <- leaflet(width = "100%") %>%
+  addTiles() %>%
+  addMarkers(lng=116.237537, lat=40.223034,popup="Xiaoxu Pan")
+m
+```
+
