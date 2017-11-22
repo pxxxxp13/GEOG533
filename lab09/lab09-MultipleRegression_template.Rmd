@@ -1,0 +1,233 @@
+---
+title: "Geog533 Lab 9"
+author: "Xiaoxu Pan"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+Complete the following exercises in Chapter 9 (More on Regression) of the textbook pages 286-287. 
+
+
+## Question 1
+
+This is Exercise 7 in Chapter 9 of the Textbook [R].
+
+The following results were obtained from a regression of $n = 14$ housing prices (in dollars) on median family income, size of house, and size of lot:
+
+```{r, echo=FALSE}
+library(knitr)
+col1 <- c("Regression SS:","Residual SS:","Total SS:")
+col2 <- c("4234","3487","")
+col3 <- c("3","","")
+col4 <- c("","","")
+col5 <- c("","","")
+df <- cbind(col1,col2,col3,col4,col5)
+colnames(df) <- c("","Sum of squares","df","Mean square","F")
+kable(df)
+```
+
+```{r, echo=FALSE}
+library(knitr)
+col1 <- c("Median family income","Size of house (sq.ft)","Size of lot (sq.ft)","Constant")
+col2 <- c("1.57","23.4","-9.5","40,000")
+col3 <- c("0.34","11.2","7.1","1000")
+col4 <- c("1.3","2.9","11.3","")
+df <- cbind(col1,col2,col3,col4)
+colnames(df) <- c("","Coefficient (b)","Standard error (sb)","VIF")
+kable(df)
+```
+
+
+### Question 1(a)
+Fill in the blanks.
+
+```{r}
+TSS <- 4234+3487
+n <- 14
+Tdf <- n-1
+df2 <- n-1-3
+RGMS <- 4234/3
+RSMS <- 3487/df2
+F <- RGMS/RSMS
+```
+|             | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|-------------|-----------------|--------------------|----------------|-----------------|
+|Regression SS|      4234       |        3           |    `r RGMS`    |      `r F`      |
+| Residual SS |      3487       |      `r df2`       |    `r RSMS`    |                 |
+| Total SS    |    `r TSS`      |      `r Tdf`       |                        
+
+### Question 1(b)
+What is the value of $r^2$? 
+
+```{r}
+Mr <- 4234/TSS
+Mr
+```
+
+
+### Question 1(c)
+What is the standard error of the estimate? 
+
+```{r}
+e <- sqrt(RSMS)
+e
+```
+
+
+### Question 1(d)
+Test the null hypothesis that $R^2 = 0$ by comparing the $F-statistic$ from the table with its critical value. 
+```{r}
+f.critical <- qf(0.95,3,10)
+if(F>f.critical){
+  print("R^2 is not equal to 0")
+}else{
+  print("R^2 is equal to 0")
+}
+```
+
+
+### Question 1(e)
+Are the coefficients in the direction you would hypothesize? If not, which coefficients are opposite in sign from what you would expect? 
+
+```{r}
+print("The coefficients of median family income and size of house are in the right direction because more income or larger size of house, higher house price. But the coefficient of size of lot is not in the right direction. I expect that the bigger size of lot the higher housing price ")
+```
+
+
+### Question 1(f)
+Find the $t-statistics$ associated with each coefficient, and test the null hypotheses that the coefficients are equal to zero. Use $ \alpha = 0.05$, and be sure to give the critical value of $t$. 
+
+```{r}
+#r <- sqrt(4234/TSS)
+n <- 14
+t1.statistics <- 1.57/0.34
+t2.statistics <- 23.4/11.2
+t3.statistics <- -9.5/7.1
+t.critical <- qt(0.975,df = n-1)
+t1.critical <- qt(0.025,df = n-1)
+if(t1.statistics>t.critical){
+  print("The coefficients of Median family income is not equal to zero")
+}else{
+  print("The coefficients of Median family income is equal to zero")
+}
+if(t2.statistics>t.critical){
+  print("The coefficients of Size of house is not equal to zero")
+}else{
+  print("The coefficients of Size of house is equal to zero")
+}
+if(t3.statistics<t1.critical){
+  print("The coefficients of Size of lot is not equal to zero")
+}else{
+  print("The coefficients of Size of lot is equal to zero")
+}
+```
+
+
+### Question 1(g)
+What do you conclude from the variance inflation factors (VIFs)? What (if any) modifications would you recommend in light of the VIFs? 
+
+```{r}
+print("Median family income and size of house do not have potential multicollinearity and size of lots have potential multicollinearity.")
+```
+
+
+### Question 1(h)
+What is the predicted sales price of a house that is 1500 square feet, on a lot 60????100??, and in a neighborhood where the median family income is $40,000?
+
+```{r}
+y <- 40000+1.57*40000+23.4*1500-(9.5*6000/144)
+y
+```
+
+
+
+## Question 2
+
+This is Exercise 10 in Chapter 9 of the Textbook [R].
+
+### Question 2(a)
+Using R and the [Hypothetical UK Housing Prices dataset](http://spatial.binghamton.edu/geog533/data/UK_Housing.csv), construct a regression equation using housing price as the dependent variable, and bedrooms, bathrooms, date built, garage, fireplace, floor area, and whether the home is detached as the independent variables. Investigate the importance of multicollinearity and outliers. Comment on the weaknesses of this specification, and on the results. 
+
+```{r}
+url = "http://spatial.binghamton.edu/geog533/data/UK_Housing.csv"
+df <- read.csv(url)
+m <- lm(df$price~df$bedrooms+df$bathrooms+df$datebuilt+df$garage+df$fireplace+df$floorarea+df$detached)
+summary(m)
+print("price=-256087.18+686.01*bedrooms+2637.29*bathrooms+130.36*datebuilt+10980.77*garage-3144.39*fireplace+374.18*floorarea+13186.76*detached")
+print("The p-values of bedrooms and bathrooms are over 0.05 so that these two variables should be deleted and this equation could express 69.67% of the relationship")
+result <- anova(m)
+s <- sum(result[1:7,3])
+vif <- 1/(1-result[1:7,3]/s)
+if(vif<5){
+  print("There are not potential multicollinearity problems")
+}else{
+  print("There are potential multicollinearity problems")
+}
+
+plot(m)
+leverage.max <- 2*7/nrow(df)
+print("In the Residuals vs Leverage diagram, the data after x = 0.028 are outliers")
+
+```
+
+
+### Question 2(b)
+Attempt to improve the regression equation found in (a). Justify your decisions in constructing and carrying out the analysis.
+
+```{r}
+m1 <- step(m,direction = "backward")
+m11 <- lm(df$price~df$datebuilt+df$garage+df$fireplace+df$floorarea+df$detached)
+summary(m11)
+print("price=-260574.57+134.39*datebuilt+10913.99*garage-3016.56*fireplace+387.53*floorarea+13935.26*detached")
+```
+
+
+
+## Question 3
+
+This is Exercise 11 in Chapter 9 of the Textbook [R].
+
+### Question 3(a)
+
+Using R and the [Milwaukee dataset](http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv) described in Section 1.9.2, construct a regression equation using housing sales price as the dependent variable, and number of bedrooms, lot size, finished square footage in the house, age of house, and number of bathrooms, as the independent variables. Investigate the importance of multicollinearity and outliers. Comment on the weaknesses of this specification, and on the results. 
+
+```{r}
+url = "http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv"
+df <- read.csv(url)
+m <- lm(df$SalePrice~df$Bedrms+df$LotSize+df$FinSqft+df$Age+df$Baths)
+summary(m)
+print("SalePrice=26240-28760*Bedrms+3.58*LotSize+100.7*FinSqft-130.6*Age+23020*Baths")
+print("The p-values of age is over 0.05 so that this variable should be deleted and this equation could express 48.67% of the relationship")
+result <- anova(m)
+s <- sum(result[1:5,3])
+vif <- 1/(1-result[1:5,3]/s)
+if(vif<5){
+  print("There are not potential multicollinearity problems")
+}else{
+  print("There are potential multicollinearity problems")
+}
+
+
+plot(m)
+
+leverage.max <- 2*5/nrow(df)
+print("In the Residuals vs Leverage diagram, the data after x = 0.006 are outliers")
+
+```
+
+
+### Question 3(b)
+Attempt to improve the regression equation found in (a). Justify your decisions in constructing and carrying out the analysis.
+
+```{r}
+m1 <- step(m,direction = "backward")
+m11 <- lm(df$SalePrice~df$Bedrms+df$LotSize+df$FinSqft+df$Baths)
+summary(m11)
+print("SalePrice=15440-28700*Bedrms+4.058*LotSize+98.49*FinSqft+24010*Baths")
+```
+
