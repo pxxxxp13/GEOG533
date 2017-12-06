@@ -1,0 +1,154 @@
+---
+title: "House Price Analysis"
+author: "Xiaoxu Pan"
+output: 
+  html_document:
+    toc : TRUE
+    toc_float : TRUE
+
+
+---
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read csv file
+
+```{r}
+url = "databefore.csv"
+dfold <- read.csv(url)
+if(!require(DT)) {install.packages("DT")}
+library(DT)
+datatable(dfold, options = list(pageLength = 6))
+
+```
+
+## Add a column of years to the data
+
+```{r}
+dfnew <- dfold
+dfnew$Years <- 2017 - dfold$Builtdate
+
+library(DT)
+datatable(dfnew, options = list(pageLength = 6))
+
+```
+
+## Linear regression for house price
+```{r}
+m <- lm(dfold$Price~dfold$Builtdate+dfold$Floorarea+dfold$Fireplace+dfold$Bedroom+dfold$Hbathroom+dfold$Fbathroom+dfold$Lotsize)
+summary(m)
+
+# Removed the data which p-value is more than 0.05 and the data whose direction is wrong
+# Remove the fireplace, bedroom, Hbathroom, Fbathroom, lotsize
+m1 <- lm(dfold$Price~dfold$Builtdate+dfold$Floorarea)
+summary(m1)
+reduced.model <- step(m1, direction="backward")
+# Standard Error of the Estimate
+sqrt(sum((dfold$Price-predict(m1))*(dfold$Price-predict(m1)))/123) 
+
+print("price=-33.6733+0.017*builtdate+0.03*floorarea")
+```
+
+## Diagrams
+```{r}
+library(car)
+# Bonferonni p-value for most extreme obs
+outlierTest(m1)
+#qq plot for studentized resid 
+qqPlot(m1)
+# leverage plots
+leveragePlots(m1)
+# Evaluate Nonlinearity
+crPlots(m1)
+```
+
+## Robust Regreesion for floorarea and price
+```{r}
+
+# Comparing the results from both standard and robust regressions
+m2.orig <- lm(dfold$Price~dfold$Floorarea)
+library(quantreg)
+m2.rq <- rq(dfold$Price~dfold$Floorarea)
+library("MASS")
+m2.rlm <- rlm(dfold$Price~dfold$Floorarea)
+summary(m2.orig)
+summary(m2.rq)
+summary(m2.rlm)
+# Standard Error of the Estimate
+sqrt(sum((dfold$Price-predict(m2.orig))*(dfold$Price-predict(m2.orig)))/123)
+
+
+plot(dfold$Price~dfold$Floorarea)
+abline(m2.orig, lty="dashed")    # use a dashed line
+abline(m2.rq, col="red")
+abline(m2.rlm, col="blue")
+legend("topleft", inset=0.05, bty="n",
+       legend = c("lm to original data", "rq fit", "rlm fit"),
+       lty = c(2, 1, 1),      # 1 = "solid" ; 2 = "dashed"
+       col = c("black", "red", "blue")
+)
+```
+
+## Nonlinear regression between price and floorarea
+```{r}
+# Self-starting Models
+library(car)
+price <- dfnew$Price
+floorarea <- dfnew$Floorarea
+
+p2 <- nls(price ~ SSlogis(floorarea,phi1,phi2,phi3),data=dfnew)
+plot(floorarea,price)
+lines(floorarea,predict(p2),col="red",lty=2,lwd=3)
+summary(p2)
+# Standard Error of the Estimate
+sqrt(sum((price-predict(p2))*(price-predict(p2)))/123)
+```
+
+
+## Nonlinear and linear regression for years and price
+```{r}
+years <- dfnew$Years
+price <- dfnew$Price
+plot(years,price)
+
+n1 <- lm(price~years)
+summary(n1)
+
+# initial value of a and b 
+a_start<-8
+b_start<-2*log(2)/a_start
+
+n2<-nls(price~a*exp(-b*years),start=list(a=a_start,b=b_start))
+cor(price,predict(n2))
+plot(years,price)
+lines(years,predict(n2),col="red",lty=2,lwd=3)
+abline(n1,col = "blue",lty="dashed")
+legend("topright", inset=0.05, bty="n",
+       legend = c("linear regression", "non-linear regression"),
+       lty = c(2, 2),     
+       col = c("blue", "red")
+       )
+# Standard Error of the Estimate for two regressions
+sqrt(sum((price-predict(n2))*(price-predict(n2)))/123)
+sqrt(sum((price-predict(n1))*(price-predict(n1)))/123)
+```
+
+## Map the price
+```{r}
+# Calculate the average price for each region
+tapply(dfold$Price,dfold$Region,mean)
+dfnew$predict <- predict(m1)
+tapply(dfnew$predict,dfnew$Region,mean)
+# Plot the map
+if(!require(rgdal)) install.packages("rgdal")
+library(rgdal)
+shape <- readOGR(dsn = ".", layer = "city")
+
+if(!require(tmap)) {install.packages("tmap")}
+library(tmap)
+qtm(shape,fill = "Average_Pr")
+qtm(shape,fill = "predict")
+```
+
